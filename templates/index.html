@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sorting Desk — Resume Screening</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wordmark">
+    <span class="wordmark-mark">&#9635;</span>
+    <span>The Sorting Desk</span>
+  </div>
+  <nav class="topnav">
+    <button class="nav-link is-active" data-view="intake">Intake</button>
+    <button class="nav-link" data-view="history">Past roles</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- INTAKE VIEW -->
+  <section id="view-intake" class="view">
+    <div class="section-label">Intake</div>
+    <div class="intake-grid">
+
+      <div class="desk-panel">
+        <h2>Describe the role</h2>
+        <p class="hint">Paste the job description. The engine reads it the way a screener would — for content, not just keywords.</p>
+        <label class="field">
+          <span>Job title</span>
+          <input type="text" id="job-title" placeholder="e.g. Backend Engineer, Spring Boot">
+        </label>
+        <label class="field">
+          <span>Job description</span>
+          <textarea id="job-description" rows="9" placeholder="Paste the full job description here — responsibilities, requirements, everything."></textarea>
+        </label>
+        <label class="field">
+          <span>Required skills <em>(optional — comma separated, sharpens the ranking)</em></span>
+          <input type="text" id="job-skills" placeholder="e.g. Java, Spring Boot, SQL, AWS">
+        </label>
+        <button id="create-job-btn" class="btn-primary">Open this role</button>
+        <p id="job-status" class="status-line"></p>
+      </div>
+
+      <div class="desk-panel" id="upload-panel">
+        <h2>Drop in resumes</h2>
+        <p class="hint">PDF, DOCX or TXT. Upload as many as you like — they'll all be screened against the role above at once.</p>
+        <div id="dropzone" class="dropzone">
+          <p class="dropzone-title">Drag files here</p>
+          <p class="dropzone-sub">or click to browse</p>
+          <input type="file" id="file-input" multiple accept=".pdf,.docx,.doc,.txt" hidden>
+        </div>
+        <ul id="file-list" class="file-list"></ul>
+        <button id="screen-btn" class="btn-primary" disabled>Screen candidates</button>
+        <p id="upload-status" class="status-line"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RESULTS VIEW -->
+  <section id="view-results" class="view" hidden>
+    <div class="results-header">
+      <div>
+        <div class="section-label">Results</div>
+        <h2 id="results-role-title">—</h2>
+      </div>
+      <div class="results-controls">
+        <label class="sort-label">
+          Sort by
+          <select id="sort-select">
+            <option value="score">Match score</option>
+            <option value="name">Name</option>
+          </select>
+        </label>
+        <input type="search" id="search-input" placeholder="Filter by name or skill…">
+      </div>
+    </div>
+    <p id="results-summary" class="hint"></p>
+    <div id="results-tray" class="results-tray"></div>
+  </section>
+
+  <!-- HISTORY VIEW -->
+  <section id="view-history" class="view" hidden>
+    <div class="section-label">Past roles</div>
+    <div id="history-list" class="history-list"></div>
+  </section>
+
+</main>
+
+<div id="loading-overlay" class="loading-overlay" hidden>
+  <div class="loading-box">
+    <div class="stamp-spinner"></div>
+    <p id="loading-text">Reading resumes…</p>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
