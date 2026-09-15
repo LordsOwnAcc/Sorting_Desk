@@ -64,6 +64,9 @@ def init_db():
     conn.close()
 
 
+init_db()
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -198,6 +201,8 @@ def download_resume(job_id, stored_name):
 
 
 if __name__ == "__main__":
-    init_db()
+    debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
     print("\n  Resume Screener running -> http://127.0.0.1:5000\n")
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    if not debug_mode:
+        print("  (debug mode off — set FLASK_DEBUG=1 for local dev auto-reload)\n")
+    app.run(host="0.0.0.0", port=5000, debug=debug_mode)
