@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sorting Desk — Candidate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wordmark">
+    <span class="wordmark-mark">&#9635;</span>
+    <span>The Sorting Desk</span>
+  </div>
+  <nav class="topnav">
+    <button class="nav-link is-active" data-view="browse">Open roles</button>
+    <button class="nav-link" data-view="applications">My applications</button>
+    <span class="topnav-user">{{ user.name }}</span>
+    <button class="nav-link" id="logout-btn">Sign out</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- BROWSE VIEW -->
+  <section id="view-browse" class="view">
+    <div class="section-label">Open roles</div>
+    <p class="hint">Every role currently open across recruiters on this board. Apply directly with your resume — you'll see exactly where you land once it's screened.</p>
+    <div id="jobs-list" class="jobs-list"></div>
+  </section>
+
+  <!-- APPLICATIONS VIEW -->
+  <section id="view-applications" class="view" hidden>
+    <div class="section-label">My applications</div>
+    <p class="hint">Track where each application stands, and open the timeline to see its full history.</p>
+    <div id="applications-list" class="applications-list"></div>
+  </section>
+
+</main>
+
+<!-- APPLY MODAL -->
+<div id="apply-modal" class="modal-overlay" hidden>
+  <div class="modal-box">
+    <button class="modal-close" id="apply-close">&times;</button>
+    <h3 id="apply-job-title">Apply</h3>
+    <p class="hint">Attach one resume (PDF, DOCX, or TXT).</p>
+    <div id="apply-dropzone" class="dropzone">
+      <p class="dropzone-title">Drag your resume here</p>
+      <p class="dropzone-sub">or click to browse</p>
+      <input type="file" id="apply-file-input" accept=".pdf,.docx,.doc,.txt" hidden>
+    </div>
+    <p id="apply-file-name" class="status-line"></p>
+    <button id="apply-submit-btn" class="btn-primary" disabled>Submit application</button>
+    <p id="apply-status" class="status-line"></p>
+  </div>
+</div>
+
+<!-- TIMELINE MODAL -->
+<div id="timeline-modal" class="modal-overlay" hidden>
+  <div class="modal-box">
+    <button class="modal-close" id="timeline-close">&times;</button>
+    <h3 id="timeline-title">Application timeline</h3>
+    <ol id="timeline-list" class="timeline-list"></ol>
+  </div>
+</div>
+
+<div id="loading-overlay" class="loading-overlay" hidden>
+  <div class="loading-box">
+    <div class="stamp-spinner"></div>
+    <p id="loading-text">Submitting…</p>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='candidate.js') }}"></script>
+</body>
+</html>

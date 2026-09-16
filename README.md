@@ -1,26 +1,37 @@
 # The Sorting Desk — Intelligent Resume Screening & Ranking
 
-A single-service web app: paste a job description, drop in a pile of resumes,
-get them read, scored, and ranked in seconds. Built to run in one command —
-no separate frontend build, no external API keys.
+A two-sided job board: recruiters post roles and get applicants ranked
+automatically; candidates browse open roles and apply with a resume. Runs as
+a single Flask service — no separate frontend build, no external API keys.
 
 ## How it works
 
-1. **Intake** — paste a job title, description, and (optionally) a comma-separated
-   list of required skills.
-2. **Upload** — drag in resumes (PDF, DOCX, or TXT). Upload as many as you want at once.
-3. **Screen** — the backend:
-   - extracts text from every resume (`pdfplumber` for PDF, `python-docx` for DOCX)
-   - pulls out name / email / phone with regex
-   - detects skills against a ~90-term tech skill dictionary
-   - scores each resume with TF-IDF cosine similarity against the job description
-     (content match), blended with required-skill coverage, into one 0–100 score
-   - ranks candidates highest to lowest
-4. **Results** — a sortable, searchable, ranked list of candidates as "dossiers,"
-   each showing the match score, matched vs. missing required skills, contact
-   info, and a link to the original resume file.
-5. **Past roles** — every job you open and every batch of resumes you screen is
-   saved to a local SQLite database, so you can come back to it.
+**Recruiters**
+1. Register / sign in as a **Recruiter**.
+2. **Post a role** — title, description, and (optionally) required skills.
+3. Candidates can now find and apply to it from their own portal. You can
+   also **upload resumes directly** on the same page if you already have
+   some on hand — they're screened into the same ranked list.
+4. Every application is scored with TF-IDF cosine similarity against the job
+   description, blended with required-skill coverage, into one 0–100 score,
+   and ranked automatically.
+5. On the **results** page for a role, **shortlist** or **reject** any
+   applicant, filter by status, and open an applicant's **timeline** to see
+   every event — applied, viewed, shortlisted/rejected — with timestamps.
+6. **Past roles** lists everything you've posted, with applicant and
+   shortlist counts.
+
+**Candidates**
+1. Register / sign in as a **Candidate**.
+2. **Open roles** lists every open posting across all recruiters. Apply
+   directly with one resume file.
+3. **My applications** shows where each application stands (applied /
+   viewed / shortlisted / rejected) and lets you open its timeline.
+
+Under the hood: `pdfplumber` / `python-docx` extract resume text, a ~90-term
+skill dictionary tags detected skills, and `scikit-learn`'s TF-IDF + cosine
+similarity scores content match. Auth is session-based with hashed
+passwords (`werkzeug.security`) — no third-party auth provider needed.
 
 ## Run it
 
@@ -30,53 +41,89 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Then open **http://127.0.0.1:5000** in your browser. That's it — Flask serves
-both the API and the frontend from the same process.
+Then open **http://127.0.0.1:5000** — it redirects to `/login`. Create one
+recruiter account and one candidate account (two different emails) to try
+the full flow yourself.
 
-Requires Python 3.9+. No internet connection or API key needed at runtime —
-everything (parsing, scoring, ranking) runs locally.
+Requires Python 3.9+. Nothing runs over the network at runtime except
+Google Fonts for the UI — parsing, scoring, and ranking are all local.
 
 ## Project structure
 
 ```
 resume-screener/
-├── app.py            Flask routes: jobs, upload/screen, candidate list, resume download
-├── parser.py          Text extraction + name/email/phone/skill extraction
-├── ranker.py           TF-IDF similarity + skill coverage → final score
+├── app.py              Flask routes: auth, jobs, applications, status, timeline
+├── auth.py              Session auth: register/login, password hashing, role decorators
+├── parser.py            Resume text extraction + name/email/phone/skill extraction
+├── ranker.py             TF-IDF similarity + skill coverage → score (batch and single)
 ├── requirements.txt
+├── .python-version       Pins Python 3.12 (see Deploying to Render below)
 ├── templates/
-│   └── index.html    Single-page frontend shell
+│   ├── login.html       Sign in / register (role picker: recruiter or candidate)
+│   ├── recruiter.html    Post roles, upload resumes, ranked results, shortlist, timeline
+│   └── candidate.html    Browse open roles, apply, track applications, timeline
 ├── static/
-│   ├── style.css      "Sorting Desk" visual design
-│   └── script.js       All frontend logic (fetch calls, rendering, drag-drop)
-├── uploads/            Uploaded resumes, stored per job (created at runtime)
+│   ├── style.css         Shared visual design
+│   ├── auth.js            Login/register page logic
+│   ├── recruiter.js        Recruiter dashboard logic
+│   └── candidate.js        Candidate portal logic
+├── uploads/              Uploaded resumes, stored per job (created at runtime)
 └── instance/
-    └── screener.db     SQLite database (created at runtime)
+    └── screener.db        SQLite database (created at runtime)
 ```
+
+## Data model
+
+- **users** — id, email, password hash, name, role (`recruiter`/`candidate`)
+- **jobs** — id, recruiter_id, title, description, required_skills, status
+- **candidates** (applications) — one row per applicant per job: linked to a
+  `user_id` if a candidate applied through the portal, or `NULL` if a
+  recruiter uploaded it directly; score, matched/missing skills, current
+  `status`
+- **application_events** — the timeline: every status change for a given
+  application, each with its own timestamp
+
+If you already have an old `instance/screener.db` from before this version,
+the app adds the new columns automatically on startup (a small migration
+step in `init_db()`), so you don't need to delete it — though a fresh DB is
+simplest if you don't need the old data.
 
 ## Notes for the demo
 
-- The scoring is fully explainable: every candidate card shows *why* they
-  ranked where they did — content-match % and which required skills were
-  found vs. missing. That's worth pointing out live; it's not a black box.
-- Try one very strong resume and one clearly mismatched resume (e.g. a
-  frontend resume against a backend JD) side by side — the ranking gap
-  makes the demo land immediately.
-- The "Past roles" tab is a nice second beat: open a role, screen a batch,
-  switch tabs, come back — shows persistence without extra explanation.
-- If you want to extend this afterward: swapping TF-IDF for a sentence-embedding
-  model (e.g. `sentence-transformers`) would improve semantic matching at the
-  cost of a heavier dependency — worth mentioning as a "next step" if asked
-  about scaling this up.
+- Have two browser windows (or one normal + one incognito) open — one
+  logged in as a recruiter, one as a candidate — so you can post a role in
+  one window and apply to it live from the other. That's the moment that
+  sells the "one platform, two sides" pitch.
+- The timeline is the feature worth lingering on: applied → viewed →
+  shortlisted, each with a real timestamp, visible to both sides. It's what
+  makes this feel like an actual applicant tracking system rather than a
+  one-shot scoring script.
+- Every score is explainable — content-match % and matched/missing skills
+  are shown right on the card, not hidden behind the number.
+
+## Deploying to Render
+
+- The included `.python-version` file pins Python to `3.12` so Render
+  doesn't fall back to a very new default version without solid
+  `numpy`/`scikit-learn` wheel support yet.
+- Build command: `pip install -r requirements.txt`
+- Start command: `gunicorn app:app`
+- Set a `SECRET_KEY` environment variable in Render's dashboard to
+  something random — the app falls back to a hardcoded dev key otherwise,
+  which is fine locally but not once this is public.
+- Free-tier disk is ephemeral: uploaded resumes and the SQLite DB reset on
+  every redeploy/restart. Fine for a demo, not for long-term storage.
 
 ## Known limitations (worth knowing, not worth hiding)
 
-- Name extraction is a heuristic (first short, non-email, non-numeric line) —
-  works for most standard resume layouts but can be wrong on heavily designed
-  templates.
+- Name extraction is a heuristic (first short, non-email, non-numeric line)
+  — works for most standard resume layouts but can be wrong on heavily
+  designed templates.
 - Skill detection is dictionary-based, not a full NLP entity extractor — it
   will miss skills outside the built-in vocabulary (easy to extend: add
   terms to `SKILL_VOCAB` in `parser.py`).
-- SQLite + local file storage is intentionally simple for a one-machine demo;
-  a real deployment would move to Postgres + object storage (S3-style) and
-  add auth.
+- Auth is intentionally minimal for a demo: no email verification, password
+  reset, or rate limiting on login attempts.
+- SQLite + local file storage is fine for a one-machine demo; a real
+  deployment would move to Postgres + object storage and add those auth
+  hardening steps.

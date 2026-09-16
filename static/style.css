@@ -553,3 +553,277 @@ main {
   }
   .dossier-stamp .rank-tag { margin-top: 0; }
 }
+
+/* ---------- Auth page ---------- */
+
+.auth-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.auth-shell {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-wordmark {
+  justify-content: center;
+  margin-bottom: 22px;
+  font-size: 22px;
+}
+
+.auth-panel {
+  width: 100%;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--paper-shadow);
+}
+
+.auth-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-on-paper-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.auth-tab.is-active {
+  color: var(--text-on-paper);
+  border-bottom-color: var(--accent-ochre);
+}
+
+.role-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.role-option {
+  flex: 1;
+  background: var(--paper-flat);
+  border: 1px solid var(--paper-shadow);
+  border-radius: 3px;
+  padding: 9px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-on-paper-muted);
+  cursor: pointer;
+}
+
+.role-option.is-active {
+  background: var(--ink);
+  color: var(--text-on-ink);
+  border-color: var(--ink);
+}
+
+.topnav-user {
+  font-size: 13px;
+  color: var(--text-on-ink-muted);
+  margin-left: 12px;
+  margin-right: 4px;
+  font-family: var(--mono);
+}
+
+.btn-small {
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+/* ---------- Status badges ---------- */
+
+.status-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+}
+
+.status-applied { background: rgba(139, 147, 161, 0.18); color: var(--text-on-paper-muted); }
+.status-viewed { background: rgba(192, 138, 46, 0.15); color: var(--accent-ochre); }
+.status-shortlisted { background: rgba(63, 112, 87, 0.16); color: var(--accent-green); }
+.status-rejected { background: rgba(168, 92, 60, 0.16); color: var(--accent-rust); }
+
+/* Status badges appear on dark backgrounds too (job cards on ink shell) */
+.job-card .status-badge, .application-card .status-badge {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ---------- Action links on dossier / job / application cards ---------- */
+
+.action-link {
+  background: none;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-on-paper);
+  cursor: pointer;
+  padding: 0;
+  border-bottom: 1px solid var(--accent-ochre);
+}
+
+.action-link:hover { color: var(--accent-ochre); }
+.action-link.is-good { color: var(--accent-green); border-bottom-color: var(--accent-green); }
+.action-link.is-bad { color: var(--accent-rust); border-bottom-color: var(--accent-rust); }
+
+#status-filter {
+  background: var(--ink-panel);
+  border: 1px solid var(--ink-border);
+  color: var(--text-on-ink);
+  border-radius: 3px;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
+/* ---------- Modals (timeline / apply) ---------- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 24, 31, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  padding: 20px;
+}
+
+.modal-overlay[hidden] { display: none; }
+
+.modal-box {
+  background: var(--paper);
+  color: var(--text-on-paper);
+  border-radius: 4px;
+  padding: 28px;
+  max-width: 460px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-box h3 {
+  font-family: var(--serif);
+  font-size: 19px;
+  margin: 0 0 16px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text-on-paper-muted);
+  cursor: pointer;
+}
+
+.modal-close:hover { color: var(--text-on-paper); }
+
+/* ---------- Timeline ---------- */
+
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--paper-shadow);
+  margin-left: 6px;
+}
+
+.timeline-list li {
+  position: relative;
+  padding: 4px 0 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timeline-list li::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-ochre);
+  border: 2px solid var(--paper);
+}
+
+.timeline-event {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.timeline-time {
+  font-size: 12px;
+  color: var(--text-on-paper-muted);
+}
+
+.timeline-note {
+  font-size: 12.5px;
+  color: var(--text-on-paper-muted);
+  font-style: italic;
+}
+
+/* ---------- Job cards (candidate browse view) ---------- */
+
+.jobs-list, .applications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.job-card, .application-card {
+  background: var(--paper);
+  color: var(--text-on-paper);
+  border-radius: 3px;
+  padding: 18px 20px;
+  box-shadow: 0 8px 0 -5px var(--paper-shadow);
+}
+
+.job-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.job-card-top h3 {
+  font-family: var(--serif);
+  font-size: 18px;
+  margin: 0;
+}
+
+.job-card-recruiter {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--text-on-paper-muted);
+}
+
+.job-card-desc {
+  font-size: 13.5px;
+  color: var(--text-on-paper-muted);
+  line-height: 1.5;
+  margin: 0 0 10px;
+}

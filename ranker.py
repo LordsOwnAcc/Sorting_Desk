@@ -33,6 +33,24 @@ def skill_coverage(required_skills: list, candidate_skills: list) -> dict:
     return {"matched": matched, "missing": missing, "pct": pct}
 
 
+def score_single(job_text: str, required_skills: list, resume_text: str, skills: list) -> dict:
+    """Score one resume against one job. Returns similarity/skill_match/score."""
+    sims = content_similarity(job_text, [resume_text])
+    sim_pct = round(sims[0] * 100, 1) if sims else 0.0
+    coverage = skill_coverage(required_skills, skills)
+    if coverage["pct"] is None:
+        final = sim_pct
+    else:
+        final = 0.55 * sim_pct + 0.45 * coverage["pct"]
+    return {
+        "similarity": sim_pct,
+        "skill_match_pct": round(coverage["pct"], 1) if coverage["pct"] is not None else None,
+        "matched_skills": coverage["matched"],
+        "missing_skills": coverage["missing"],
+        "score": round(final, 1),
+    }
+
+
 def compute_scores(job_text: str, required_skills: list, candidates: list) -> list:
     """
     candidates: list of dicts each with 'resume_text' and 'skills'.

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sorting Desk — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="auth-body">
+
+<div class="auth-shell">
+  <div class="wordmark auth-wordmark">
+    <span class="wordmark-mark">&#9635;</span>
+    <span>The Sorting Desk</span>
+  </div>
+
+  <div class="desk-panel auth-panel">
+    <div class="auth-tabs">
+      <button class="auth-tab is-active" data-tab="login">Sign in</button>
+      <button class="auth-tab" data-tab="register">Create account</button>
+    </div>
+
+    <!-- LOGIN -->
+    <form id="login-form" class="auth-form">
+      <label class="field">
+        <span>Email</span>
+        <input type="email" id="login-email" required autocomplete="email">
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </label>
+      <button type="submit" class="btn-primary">Sign in</button>
+      <p id="login-status" class="status-line"></p>
+    </form>
+
+    <!-- REGISTER -->
+    <form id="register-form" class="auth-form" hidden>
+      <label class="field">
+        <span>I am a…</span>
+        <div class="role-toggle">
+          <button type="button" class="role-option is-active" data-role="recruiter">Recruiter</button>
+          <button type="button" class="role-option" data-role="candidate">Candidate</button>
+        </div>
+      </label>
+      <label class="field">
+        <span>Full name</span>
+        <input type="text" id="register-name" required autocomplete="name">
+      </label>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" id="register-email" required autocomplete="email">
+      </label>
+      <label class="field">
+        <span>Password <em>(at least 6 characters)</em></span>
+        <input type="password" id="register-password" required autocomplete="new-password">
+      </label>
+      <button type="submit" class="btn-primary">Create account</button>
+      <p id="register-status" class="status-line"></p>
+    </form>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='auth.js') }}"></script>
+</body>
+</html>
