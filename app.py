@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import uuid
+from datetime import datetime, timezone
 from flask import (
     Flask, request, jsonify, render_template, send_from_directory, g,
     session, redirect, url_for,
@@ -34,6 +35,11 @@ def close_db(exception=None):
     db = g.pop("db", None)
     if db is not None:
         db.close()
+
+
+def now_str():
+    """UTC timestamp string matching SQLite's CURRENT_TIMESTAMP format."""
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def _ensure_column(conn, table, column, coldef):
@@ -102,7 +108,7 @@ def init_db():
     _ensure_column(conn, "jobs", "status", "TEXT NOT NULL DEFAULT 'open'")
     _ensure_column(conn, "candidates", "user_id", "TEXT")
     _ensure_column(conn, "candidates", "status", "TEXT NOT NULL DEFAULT 'applied'")
-    _ensure_column(conn, "candidates", "applied_at", "TEXT DEFAULT CURRENT_TIMESTAMP")
+    _ensure_column(conn, "candidates", "applied_at", "TEXT")
     conn.commit()
     conn.close()
 
@@ -289,12 +295,12 @@ def screen_resumes(job_id):
         db.execute(
             """INSERT INTO candidates
                (id, job_id, user_id, filename, stored_name, name, email, phone, skills,
-                matched_skills, missing_skills, similarity, skill_match_pct, score, rank, status)
-               VALUES (?,?,NULL,?,?,?,?,?,?,?,?,?,?,?,?,'applied')""",
+                matched_skills, missing_skills, similarity, skill_match_pct, score, rank, status, applied_at)
+               VALUES (?,?,NULL,?,?,?,?,?,?,?,?,?,?,?,?,'applied',?)""",
             (
                 c["id"], job_id, c["filename"], c["stored_name"], c["name"], c["email"], c["phone"],
                 ",".join(c["skills"]), ",".join(c["matched_skills"]), ",".join(c["missing_skills"]),
-                c["similarity"], c["skill_match_pct"], c["score"], c["rank"],
+                c["similarity"], c["skill_match_pct"], c["score"], c["rank"], now_str(),
             ),
         )
         log_event(db, c["id"], "applied", note="Uploaded directly by recruiter")
@@ -457,13 +463,13 @@ def apply_to_job(job_id):
     db.execute(
         """INSERT INTO candidates
            (id, job_id, user_id, filename, stored_name, name, email, phone, skills,
-            matched_skills, missing_skills, similarity, skill_match_pct, score, rank, status)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL,'applied')""",
+            matched_skills, missing_skills, similarity, skill_match_pct, score, rank, status, applied_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL,'applied',?)""",
         (
             candidate_id, job_id, user["id"], f.filename, stored_name,
             contact["name"] or user["name"], contact["email"], contact["phone"],
             ",".join(skills), ",".join(result["matched_skills"]), ",".join(result["missing_skills"]),
-            result["similarity"], result["skill_match_pct"], result["score"],
+            result["similarity"], result["skill_match_pct"], result["score"], now_str(),
         ),
     )
     log_event(db, candidate_id, "applied", note="Applied via candidate portal")
